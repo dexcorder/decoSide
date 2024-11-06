@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>토글 가능한 사이드바</title>
+<style>
+  
+/* 전체 컨테이너 설정 */
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+/* 사이드바 컨테이너 */
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  height: 100%;
+  transition: margin-left 0.3s ease; /* margin-left로 애니메이션 효과 적용 */
+}
+
+.sidebar-container.collapsed {
+  margin-left: -200px; /* 사이드바가 닫힐 때의 위치 */
+}
+
+/* 사이드바 스타일 */
+.sidebar {
+  background-color: #333;
+  color: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  overflow: hidden;
+  width: 230px;
+}
+
+/* 토글 버튼 스타일 */
+.toggle-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  align-self: flex-end; /* 사이드바 오른쪽 상단에 배치 */
+}
+
+/* 링크 스타일 */
+.sidebar a {
+  color: #ddd;
+  font-size: 18px;
+  text-decoration: none;
+  display: block;
+  padding: 10px 15px; /* 고정된 패딩으로 크기 유지 */
+  transition: background-color 0.3s ease, color 0.3s ease; /* 배경색과 텍스트 색상 전환 애니메이션 */
+}
+
+.sidebar a:hover {
+  background-color: #575757;
+  color: #fff;
+}
+
+
+
+
+
+</style>
+</head>
+<body>
+
+  <!-- 사이드바 컨테이너 -->
+  <div class="sidebar-container" id="sidebar_container">
+    <!-- 사이드바 -->
+    <div class="sidebar" id="sidebar">
+        <!-- 토글 버튼 -->
+        <button class="toggle-btn" onclick="toggleSidebar()" id="toggle-btn">&#9776;</button>
+        <a href="#">홈</a>
+        <a href="#">소개</a>
+        <a href="#">서비스</a>
+        <a href="#">연락처</a>
+    </div>
+</div>
+
+<script>
+    // 사이드바 토글 함수
+    function toggleSidebar() {
+      const sidebarIframe = parent.document.querySelector("iframe.sidebar");
+      //const sidebar = document.getElementById("sidebar");
+      const sidebarContainer = document.getElementById("sidebar_container");
+      const toggleBtn = document.getElementById("toggle-btn");
+
+      // 토글 시 클래스 추가/제거
+      sidebarContainer.classList.toggle("collapsed");
+      sidebarIframe.classList.toggle("collapsed"); // iframe에 collapsed 클래스 추가/제거
+
+      // 아이콘 변경
+      if (sidebarContainer.classList.contains("collapsed")) {
+        toggleBtn.innerHTML = "&#9776;"; // 햄버거 아이콘 (사이드바 닫힘)
+      } else {
+        toggleBtn.innerHTML = "&#9776;"; // 닫기 아이콘 (사이드바 열림)
+      }
+    }
+</script>
+
+</body>
+</html>
