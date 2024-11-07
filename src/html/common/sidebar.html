@@ -21,11 +21,12 @@ body, html {
   flex-direction: column;
   width: 250px;
   height: 100%;
-  transition: margin-left 0.3s ease; /* margin-left로 애니메이션 효과 적용 */
+  transition: margin-left 0.4s ease, opacity 0.7s ease-in-out; /* margin-left로 애니메이션 효과 적용 */
+  opacity: 1;
 }
 
 .sidebar-container.collapsed {
-  margin-left: -200px; /* 사이드바가 닫힐 때의 위치 */
+  margin-left: -220px; /* 사이드바가 닫힐 때의 위치 */
 }
 
 /* 사이드바 스타일 */
@@ -59,24 +60,33 @@ body, html {
   text-decoration: none;
   display: block;
   padding: 10px 15px; /* 고정된 패딩으로 크기 유지 */
-  transition: background-color 0.3s ease, color 0.3s ease; /* 배경색과 텍스트 색상 전환 애니메이션 */
+  transition: background-color 0.4s ease, color 0.4s ease; /* 배경색과 텍스트 색상 전환 애니메이션 */
 }
-
+/* 사이드바 iframe 스타일 */
+.sidebar {
+  width: 250px;
+  height: 100%;
+  border: none;
+  transition: width 0.4s ease; /* 부드러운 애니메이션 효과 */
+}
 .sidebar a:hover {
   background-color: #575757;
   color: #fff;
 }
-
-
-
-
+.sidebar.collapsed {
+  width: 50px; /* 닫힐 때의 너비 */
+}
+.inviSide {
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out;
+}
 
 </style>
 </head>
 <body>
 
   <!-- 사이드바 컨테이너 -->
-  <div class="sidebar-container" id="sidebar_container">
+  <div class="sidebar-container inviSide" id="sidebar_container">
     <!-- 사이드바 -->
     <div class="sidebar" id="sidebar">
         <!-- 토글 버튼 -->
@@ -89,24 +99,54 @@ body, html {
 </div>
 
 <script>
-    // 사이드바 토글 함수
-    function toggleSidebar() {
-      const sidebarIframe = parent.document.querySelector("iframe.sidebar");
-      //const sidebar = document.getElementById("sidebar");
-      const sidebarContainer = document.getElementById("sidebar_container");
-      const toggleBtn = document.getElementById("toggle-btn");
+  window.addEventListener('DOMContentLoaded', () => {
+    toggleSidebar(1);
+  });
 
-      // 토글 시 클래스 추가/제거
-      sidebarContainer.classList.toggle("collapsed");
-      sidebarIframe.classList.toggle("collapsed"); // iframe에 collapsed 클래스 추가/제거
+  // 사이드바 토글 함수
+  function toggleSidebar(removeClass) {
 
-      // 아이콘 변경
-      if (sidebarContainer.classList.contains("collapsed")) {
-        toggleBtn.innerHTML = "&#9776;"; // 햄버거 아이콘 (사이드바 닫힘)
-      } else {
-        toggleBtn.innerHTML = "&#9776;"; // 닫기 아이콘 (사이드바 열림)
-      }
+    const toggledWidth = 50;
+    const untoggledWidth = 300;
+
+    const parentDocument = window.parent.document;
+    const parentIframe = parentDocument.querySelector("iframe");
+    const sidebarIframe = parentDocument.querySelector("iframe.sidebar");
+    const sidebarContainer = document.getElementById("sidebar_container");
+    const toggleBtn = document.getElementById("toggle-btn");
+
+  
+    // 토글 시 클래스 추가/제거
+    sidebarContainer.classList.toggle("collapsed");
+    sidebarIframe.classList.toggle("collapsed"); // iframe에 collapsed 클래스 추가/제거etWidth;
+
+    // 아이콘 변경
+    if (sidebarContainer.classList.contains("collapsed")) {
+      toggleBtn.innerHTML = "&#9776;"; // 햄버거 아이콘 (사이드바 닫힘)
+      setTimeout(() => {
+        sidebarIframe.style.width = toggledWidth + 'px';
+        parentIframe.style.transition = 'width 0.4s';    
+      }, 10);
+      
+    } else {
+      toggleBtn.innerHTML = "&#9776;"; // 닫기 아이콘 (사이드바 열림)
+      setTimeout(() => {
+        sidebarIframe.style.width = untoggledWidth + 'px';
+        parentIframe.style.transition = 'width 0.4s';
+      }, 10);
     }
+
+    if(removeClass === 1) {
+      toggleBtn.innerHTML = "&#9776;"; // 닫기 아이콘 (사이드바 열림)
+      setTimeout(() => {
+        sidebarIframe.style.width = untoggledWidth + 'px';
+        parentIframe.style.transition = 'width 0.4s';
+      }, 10);
+      sidebarContainer.classList.remove('collapsed');
+      sidebarContainer.classList.remove('inviSide');
+    }
+  }
+    
 </script>
 
 </body>
