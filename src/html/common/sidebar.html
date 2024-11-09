@@ -86,7 +86,7 @@ body, html {
 <body>
 
   <!-- 사이드바 컨테이너 -->
-  <div class="sidebar-container inviSide" id="sidebar_container">
+  <div class="sidebar-container" id="sidebar_container">
     <!-- 사이드바 -->
     <div class="sidebar" id="sidebar">
         <!-- 토글 버튼 -->
@@ -101,8 +101,6 @@ body, html {
 <script>
   window.addEventListener('DOMContentLoaded', () => {
     const sidebarContainer = document.querySelector('#sidebar_container');
-    sidebarContainer.style.opacity = '0.1';
-  
     toggleSidebar(1);
   });
 
@@ -113,12 +111,10 @@ body, html {
     const untoggledWidth = 300;
 
     const parentDocument = window.parent.document;
-    const parentIframe = parentDocument.querySelector("iframe");
-    const sidebarIframe = parentDocument.querySelector("iframe.sidebar");
+    const sidebarIframe = parentDocument.querySelector("iframe.sidebar") ?? parentDocument.querySelector("#sidebar_container");
     const sidebarContainer = document.getElementById("sidebar_container");
     const toggleBtn = document.getElementById("toggle-btn");
-
-  
+    
     // 토글 시 클래스 추가/제거
     sidebarContainer.classList.toggle("collapsed");
     sidebarIframe.classList.toggle("collapsed"); // iframe에 collapsed 클래스 추가/제거etWidth;
@@ -128,14 +124,14 @@ body, html {
       toggleBtn.innerHTML = "&#9776;"; // 햄버거 아이콘 (사이드바 닫힘)
       setTimeout(() => {
         sidebarIframe.style.width = toggledWidth + 'px';
-        parentIframe.style.transition = 'width 0.4s';    
+        sidebarIframe.style.transition = 'width 0.4s';    
       }, 10);
       
     } else {
       toggleBtn.innerHTML = "&#9776;"; // 닫기 아이콘 (사이드바 열림)
       setTimeout(() => {
         sidebarIframe.style.width = untoggledWidth + 'px';
-        parentIframe.style.transition = 'width 0.4s';
+        sidebarIframe.style.transition = 'width 0.4s';
       }, 10);
     }
 
@@ -143,11 +139,10 @@ body, html {
       toggleBtn.innerHTML = "&#9776;"; // 닫기 아이콘 (사이드바 열림)
       setTimeout(() => {
         sidebarIframe.style.width = untoggledWidth + 'px';
-        parentIframe.style.transition = 'width 0.4s';
+        sidebarIframe.style.transition = 'width 0.4s';
       }, 10);
-      sidebarContainer.classList.remove('collapsed');
       sidebarContainer.classList.remove('inviSide');
-      sidebarContainer.style.opacity = 1;
+      console.log("여기까지 안왔어?");
     }
   }
     
