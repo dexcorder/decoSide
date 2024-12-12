@@ -52,28 +52,77 @@ body, html {
   margin-bottom: 20px;
   align-self: flex-end; /* 사이드바 오른쪽 상단에 배치 */
 }
-
-/* 링크 스타일 */
-.sidebar a {
-  color: #ddd;
-  font-size: 18px;
-  text-decoration: none;
-  display: block;
-  padding: 10px 15px; /* 고정된 패딩으로 크기 유지 */
-  transition: background-color 0.4s ease, color 0.4s ease; /* 배경색과 텍스트 색상 전환 애니메이션 */
-}
 /* 사이드바 iframe 스타일 */
 .sidebar {
   width: 250px;
   height: 100%;
   border: none;
 }
-.sidebar a:hover {
-  background-color: #575757;
-  color: #fff;
-}
 .sidebar.collapsed {
   width: 50px; /* 닫힐 때의 너비 */
+}
+
+.menu-item {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+/* 기본 서브메뉴 스타일: 숨김 */
+.submenu {
+    padding-left: 30px;
+    max-height: 0; /* 초기 상태: 높이 0 */
+    overflow: hidden; /* 넘침 방지 */
+    opacity: 0; /* 투명도 0으로 설정 */
+    transition: all 0.4s ease; /* 높이와 투명도 조정 애니메이션 */
+}
+/* 서브메뉴가 열렸을 때 */
+.submenu.open {
+    max-height: 200px; /* 적절한 최대 높이 설정 (서브메뉴 항목 길이에 맞춰 늘어남) */
+    opacity: 1; /* 서브메뉴 보이도록 */
+}
+
+.submenu a {
+    display: block;
+    color: rgba(255, 255, 255, 0.72);
+    text-decoration: none;
+    padding: 5px 0;
+}
+
+.submenu a:hover {
+    background-color: #575757;
+    color: #fff;
+}
+
+/* 메뉴 항목 기본 스타일 */
+.menu-item > a {
+    display: block;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    color: #ddd;
+    font-size: 18px;
+    padding: 10px 15px; /* 고정된 패딩으로 크기 유지 */
+    transition: background-color 0.4s ease, color 0.4s ease; /* 배경색과 텍스트 색상 전환 애니메이션 */
+}
+
+.menu-item > a:hover {
+    background-color: #575757;
+    color: #fff;
+}
+/* 화살표 아이콘 */
+.menu-item > a::after {
+    content: '▼';
+    float: right;
+    font-size: 12px;
+    transition: transform 0.3s; /* 화살표 회전 효과 */
+}
+/* 서브메뉴가 없는 경우 화살표를 숨김 */
+.menu-item.no-submenu > a::after {
+    content: ''; /* 화살표 제거 */
+}
+/* 서브메뉴 열림 상태일 때 화살표 회전 */
+.menu-item > a.open::after {
+    transform: rotate(-180deg); /* 열렸을 때 화살표 위로 */
 }
 
 </style>
@@ -86,10 +135,39 @@ body, html {
     <div class="sidebar" id="sidebar">
         <!-- 토글 버튼 -->
         <button class="toggle-btn" onclick="toggleSidebar()" id="toggle-btn">&#9776;</button>
-        <a href="#">홈</a>
-        <a href="#">소개</a>
-        <a href="#">서비스</a>
-        <a href="#">연락처</a>
+        <!-- 홈 -->
+        <div class="menu-item">
+            <a href="#">홈</a>
+        </div>
+
+        <!-- 소개 -->
+        <div class="menu-item">
+            <a href="#">소개</a>
+            <div class="submenu">
+                <a href="#">회사 개요</a>
+                <a href="#">팀 소개</a>
+                <a href="#">역사</a>
+            </div>
+        </div>
+
+        <!-- 서비스 -->
+        <div class="menu-item">
+            <a href="#">서비스</a>
+            <div class="submenu">
+                <a href="#">웹 개발</a>
+                <a href="#">모바일 앱</a>
+                <a href="#">SEO</a>
+            </div>
+        </div>
+
+        <!-- 연락처 -->
+        <div class="menu-item">
+            <a href="#">연락처</a>
+            <div class="submenu">
+                <a href="#">문의하기</a>
+                <a href="#">찾아오시는 길</a>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -98,7 +176,6 @@ body, html {
   // 사이드바 토글 함수
   const TOGGLED_WIDTH = 50;
   const UNTOGGLED_WIDTH = 300;
-  const HAMBURGER_ICON = "&#9776;";
 
   function toggleSidebar() {
       const parentDocument = window.parent.document;
@@ -112,10 +189,8 @@ body, html {
       updateSidebarStyle(isCollapsed, sidebarIframe, toggleBtn);
   }
 
-
   function updateSidebarStyle(isCollapsed, sidebarIframe, toggleBtn) {
       const newWidth = isCollapsed ? TOGGLED_WIDTH : UNTOGGLED_WIDTH;
-      toggleBtn.innerHTML = HAMBURGER_ICON;
       applySidebarTransition(sidebarIframe, newWidth);
   }
 
@@ -130,6 +205,26 @@ body, html {
 
   window.addEventListener('DOMContentLoaded', () => {
       const sidebarContainer = document.querySelector('#sidebar_container');
+      const menuItems = document.querySelectorAll(".menu-item");
+
+      menuItems.forEach(item => {
+          const submenu = item.querySelector(".submenu");
+
+          // 서브메뉴가 없는 경우 no-submenu 클래스 추가
+          if (!submenu) {
+              item.classList.add("no-submenu");
+          }
+
+          // 서브메뉴가 있는 경우 클릭 시 토글 이벤트 추가
+          const link = item.querySelector("a");
+          if (submenu) {
+              link.addEventListener("click", function (e) {
+                  e.preventDefault(); // 링크 기본 동작 방지
+                  submenu.classList.toggle("open");
+                  link.classList.toggle("open");
+              });
+          }
+      });
   });
 
 </script>
