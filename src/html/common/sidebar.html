@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>토글 가능한 사이드바</title>
 <style>
-  
+
 /* 전체 컨테이너 설정 */
 body, html {
   margin: 0;
@@ -67,7 +67,6 @@ body, html {
   width: 250px;
   height: 100%;
   border: none;
-  transition: width 0.4s ease; /* 부드러운 애니메이션 효과 */
 }
 .sidebar a:hover {
   background-color: #575757;
@@ -75,10 +74,6 @@ body, html {
 }
 .sidebar.collapsed {
   width: 50px; /* 닫힐 때의 너비 */
-}
-.inviSide {
-  opacity: 0;
-  transition: opacity 0.7s ease-in-out;
 }
 
 </style>
@@ -99,53 +94,44 @@ body, html {
 </div>
 
 <script>
-  window.addEventListener('DOMContentLoaded', () => {
-    const sidebarContainer = document.querySelector('#sidebar_container');
-    toggleSidebar(1);
-  });
 
   // 사이드바 토글 함수
-  function toggleSidebar(removeClass) {
+  const TOGGLED_WIDTH = 50;
+  const UNTOGGLED_WIDTH = 300;
+  const HAMBURGER_ICON = "&#9776;";
 
-    const toggledWidth = 50;
-    const untoggledWidth = 300;
+  function toggleSidebar() {
+      const parentDocument = window.parent.document;
+      const sidebarIframe = parentDocument.querySelector("iframe.sidebar") ?? parentDocument.querySelector("#sidebar_container");
+      const sidebarContainer = document.getElementById("sidebar_container");
+      const toggleBtn = document.getElementById("toggle-btn");
 
-    const parentDocument = window.parent.document;
-    const sidebarIframe = parentDocument.querySelector("iframe.sidebar") ?? parentDocument.querySelector("#sidebar_container");
-    const sidebarContainer = document.getElementById("sidebar_container");
-    const toggleBtn = document.getElementById("toggle-btn");
-    
-    // 토글 시 클래스 추가/제거
-    sidebarContainer.classList.toggle("collapsed");
-    sidebarIframe.classList.toggle("collapsed"); // iframe에 collapsed 클래스 추가/제거etWidth;
-
-    // 아이콘 변경
-    if (sidebarContainer.classList.contains("collapsed")) {
-      toggleBtn.innerHTML = "&#9776;"; // 햄버거 아이콘 (사이드바 닫힘)
-      setTimeout(() => {
-        sidebarIframe.style.width = toggledWidth + 'px';
-        sidebarIframe.style.transition = 'width 0.4s';    
-      }, 10);
-      
-    } else {
-      toggleBtn.innerHTML = "&#9776;"; // 닫기 아이콘 (사이드바 열림)
-      setTimeout(() => {
-        sidebarIframe.style.width = untoggledWidth + 'px';
-        sidebarIframe.style.transition = 'width 0.4s';
-      }, 10);
-    }
-
-    if(removeClass === 1) {
-      toggleBtn.innerHTML = "&#9776;"; // 닫기 아이콘 (사이드바 열림)
-      setTimeout(() => {
-        sidebarIframe.style.width = untoggledWidth + 'px';
-        sidebarIframe.style.transition = 'width 0.4s';
-      }, 10);
-      sidebarContainer.classList.remove('inviSide');
-      console.log("여기까지 안왔어?");
-    }
+      // 사이드바와 아이콘 업데이트
+      const isCollapsed = sidebarContainer.classList.toggle("collapsed");
+      sidebarIframe.classList.toggle("collapsed");
+      updateSidebarStyle(isCollapsed, sidebarIframe, toggleBtn);
   }
-    
+
+
+  function updateSidebarStyle(isCollapsed, sidebarIframe, toggleBtn) {
+      const newWidth = isCollapsed ? TOGGLED_WIDTH : UNTOGGLED_WIDTH;
+      toggleBtn.innerHTML = HAMBURGER_ICON;
+      applySidebarTransition(sidebarIframe, newWidth);
+  }
+
+  function applySidebarTransition(sidebarIframe, width) {
+      // 강제 리페인트를 위해 트릭 사용
+      sidebarIframe.style.width = sidebarIframe.offsetWidth + "px"; // 리페인트 강제 수행
+      requestAnimationFrame(() => {
+          sidebarIframe.style.transition = "width 0.4s ease";
+          sidebarIframe.style.width = width + "px";
+      });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+      const sidebarContainer = document.querySelector('#sidebar_container');
+  });
+
 </script>
 
 </body>

@@ -7,5 +7,5 @@
 /dataSources/
 /dataSources.local.xml
 
-# .idea 디렉토리의 모든 파일 무시
+# Ignore all files in the .idea directory
 .idea/*
