@@ -7,5 +7,5 @@
 /dataSources/
 /dataSources.local.xml
 
-# ignored intellij sys files
-/.idea/
+# .idea 디렉토리의 모든 파일 무시
+.idea/*
