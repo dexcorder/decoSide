@@ -10,7 +10,8 @@
   <!-- 레이아웃을 위한 wrapper -->
   <div class="wrapper" id="wrapper">
     <!-- 사이드바 iframe -->
-    <iframe src="./common/sidebar.html" class="sidebar" style="border: none;"></iframe>
+    <iframe src="./common/sidebar.html" id="decoSide" class="sidebar" loading="lazy" style="border: none;">
+    </iframe>
     <!-- AI가 세상을 지배한다!! -->
     <!-- 일단 제거한 뒤에 말이야 -->
     <!-- 웹 자격 증명에서 sourcetree에 있는 password를 token값으로 바꿔야하는 듯? -->
@@ -27,6 +28,29 @@
     </div>
   </div>
 
-  <script src="/src/js/common.js"></script>
+  <script>
+    const menuList = [
+      { "id": 1, "name": "홈", "url": "/src/html/menu.html", "icon": "/icons/menu.svg", "parent_id": null },
+
+      { "id": 2, "name": "소개", "url": "", "icon": "fas fa-home", "parent_id": null },
+      { "id": 3, "name": "회사 개요", "url": "/src/html/corpus.html", "icon": "/icons/corpus.svg", "parent_id": 2 },
+      { "id": 4, "name": "팀 소개", "url": "/src/html/introTeam.html", "icon": "/icons/corpus.svg", "parent_id": 2 },
+      { "id": 5, "name": "역사", "url": "/src/html/history.html", "icon": "/icons/corpus.svg", "parent_id": 2 },
+
+      { "id": 6, "name": "서비스", "url": "", "icon": "/icons/menu.svg", "parent_id": null },
+      { "id": 7, "name": "웹 개발", "url": "/src/html/corpus.html", "icon": "/icons/corpus.svg", "parent_id": 6 },
+      { "id": 8, "name": "모바일 앱", "url": "/src/html/introTeam.html", "icon": "/icons/corpus.svg", "parent_id": 6 },
+      { "id": 9, "name": "SEO", "url": "/src/html/history.html", "icon": "/icons/corpus.svg", "parent_id": 6 },
+
+      { "id": 10, "name": "연락처", "url": "", "icon": "/icons/menu.svg", "parent_id": null },
+      { "id": 11, "name": "문의하기", "url": "/src/html/corpus.html", "icon": "/icons/corpus.svg", "parent_id": 10 },
+      { "id": 12, "name": "찾아오시는 길", "url": "/src/html/introTeam.html", "icon": "/icons/corpus.svg", "parent_id": 10 }
+    ];
+
+    const decoFrame = document.querySelector('iframe#decoSide');
+    decoFrame.addEventListener('load', () => {
+      decoFrame.contentWindow.postMessage(menuList, '*');
+    });
+  </script>
 </body>
 </html>

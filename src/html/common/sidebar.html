@@ -135,47 +135,98 @@ body, html {
     <div class="sidebar" id="sidebar">
         <!-- 토글 버튼 -->
         <button class="toggle-btn" onclick="toggleSidebar()" id="toggle-btn">&#9776;</button>
-        <!-- 홈 -->
-        <div class="menu-item">
-            <a href="#">홈</a>
-        </div>
 
-        <!-- 소개 -->
-        <div class="menu-item">
-            <a href="#">소개</a>
-            <div class="submenu">
-                <a href="#">회사 개요</a>
-                <a href="#">팀 소개</a>
-                <a href="#">역사</a>
-            </div>
-        </div>
-
-        <!-- 서비스 -->
-        <div class="menu-item">
-            <a href="#">서비스</a>
-            <div class="submenu">
-                <a href="#">웹 개발</a>
-                <a href="#">모바일 앱</a>
-                <a href="#">SEO</a>
-            </div>
-        </div>
-
-        <!-- 연락처 -->
-        <div class="menu-item">
-            <a href="#">연락처</a>
-            <div class="submenu">
-                <a href="#">문의하기</a>
-                <a href="#">찾아오시는 길</a>
-            </div>
-        </div>
     </div>
 </div>
 
 <script>
-
   // 사이드바 토글 함수
   const TOGGLED_WIDTH = 50;
-  const UNTOGGLED_WIDTH = 300;
+  const UNTOGGLED_WIDTH = 300
+
+  window.addEventListener('DOMContentLoaded', () => {
+      const sidebarContainer = document.querySelector('#sidebar_container');
+
+
+  })
+
+  window.addEventListener('message', (event) => {
+      const data = event.data;
+
+      if (Array.isArray(data)) {
+          const menuTree = buildMenuTree(data); // 플랫 데이터를 트리 구조로 변환
+          renderMenu(menuTree); // 트리 구조를 기반으로 메뉴 렌더링
+      }
+  });
+
+  // 플랫 구조 데이터를 트리 구조로 변환하는 함수
+  function buildMenuTree(flatData) {
+      const menuMap = {};
+      const menuTree = [];
+
+      // 모든 항목을 ID 기준으로 매핑
+      flatData.forEach(item => {
+          menuMap[item.id] = { ...item, children: [] };
+      });
+
+      // 부모-자식 관계를 연결
+      flatData.forEach(item => {
+          if (item.parent_id === null) {
+              menuTree.push(menuMap[item.id]); // 최상위 메뉴
+          } else {
+              menuMap[item.parent_id]?.children.push(menuMap[item.id]); // 서브 메뉴
+          }
+      });
+      return menuTree;
+  }
+
+  // 동적으로 메뉴 렌더링
+  function renderMenu(menuTree) {
+      const sidebar = document.querySelector('#sidebar');
+      sidebar.innerHTML = ''; // 기존 메뉴 초기화
+
+      menuTree.forEach(menu => {
+          const menuItem = createMenuItem(menu);
+          sidebar.appendChild(menuItem);
+      });
+  }
+
+  // 메뉴 항목을 생성하는 함수
+  function createMenuItem(menu) {
+      const menuItem = document.createElement('div');
+      menuItem.classList.add('menu-item');
+
+      // 메뉴 링크
+      const menuLink = document.createElement('a');
+      menuLink.href = menu.url || '#';
+      menuLink.textContent = menu.name;
+
+      menuItem.appendChild(menuLink);
+
+      // 서브 메뉴가 있는 경우
+      if (menu.children && menu.children.length > 0) {
+          const submenu = document.createElement('div');
+          submenu.classList.add('submenu');
+
+          menu.children.forEach(child => {
+              const childItem = createMenuItem(child);
+              submenu.appendChild(childItem);
+          });
+
+          // 서브 메뉴 토글 기능 추가
+          menuLink.addEventListener('click', (e) => {
+              e.preventDefault(); // 기본 링크 동작 방지
+              submenu.classList.toggle('open'); // 서브 메뉴 열고 닫기
+              menuLink.classList.toggle('open'); // 화살표 회전 효과
+          });
+
+          menuItem.appendChild(submenu);
+      } else {
+          menuItem.classList.add('no-submenu'); // 서브 메뉴가 없을 경우
+      }
+
+      return menuItem;
+  }
 
   function toggleSidebar() {
       const parentDocument = window.parent.document;
@@ -202,30 +253,6 @@ body, html {
           sidebarIframe.style.width = width + "px";
       });
   }
-
-  window.addEventListener('DOMContentLoaded', () => {
-      const sidebarContainer = document.querySelector('#sidebar_container');
-      const menuItems = document.querySelectorAll(".menu-item");
-
-      menuItems.forEach(item => {
-          const submenu = item.querySelector(".submenu");
-
-          // 서브메뉴가 없는 경우 no-submenu 클래스 추가
-          if (!submenu) {
-              item.classList.add("no-submenu");
-          }
-
-          // 서브메뉴가 있는 경우 클릭 시 토글 이벤트 추가
-          const link = item.querySelector("a");
-          if (submenu) {
-              link.addEventListener("click", function (e) {
-                  e.preventDefault(); // 링크 기본 동작 방지
-                  submenu.classList.toggle("open");
-                  link.classList.toggle("open");
-              });
-          }
-      });
-  });
 
 </script>
 
