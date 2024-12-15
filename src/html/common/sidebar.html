@@ -101,7 +101,7 @@ body, html {
     border-radius: 5px;
     color: #ddd;
     font-size: 18px;
-    padding: 10px 15px; /* 고정된 패딩으로 크기 유지 */
+    padding: 10px 10px 10px 10px; /* 고정된 패딩으로 크기 유지 */
     transition: background-color 0.4s ease, color 0.4s ease; /* 배경색과 텍스트 색상 전환 애니메이션 */
 }
 
@@ -135,7 +135,7 @@ body, html {
     <div class="sidebar" id="sidebar">
         <!-- 토글 버튼 -->
         <button class="toggle-btn" onclick="toggleSidebar()" id="toggle-btn">&#9776;</button>
-
+        <div class="menu-area" style="width: 100%;"></div>
     </div>
 </div>
 
@@ -154,40 +154,33 @@ body, html {
       const data = event.data;
 
       if (Array.isArray(data)) {
-          const menuTree = buildMenuTree(data); // 플랫 데이터를 트리 구조로 변환
-          renderMenu(menuTree); // 트리 구조를 기반으로 메뉴 렌더링
+          const menuMap = {};
+          const menuTree = [];
+
+          // 모든 항목을 ID 기준으로 매핑
+          data.forEach(item => menuMap[item.id] = { ...item, children: [] });
+
+          // 부모-자식 관계를 연결
+          data.forEach(item => {
+              if (item.parent_id === null) {
+                  menuTree.push(menuMap[item.id]); // 최상위 메뉴
+              } else {
+                  menuMap[item.parent_id]?.children.push(menuMap[item.id]); // 서브 메뉴
+              }
+          });
+
+          renderMenu(menuTree); // html 요소 그리기
       }
   });
 
-  // 플랫 구조 데이터를 트리 구조로 변환하는 함수
-  function buildMenuTree(flatData) {
-      const menuMap = {};
-      const menuTree = [];
-
-      // 모든 항목을 ID 기준으로 매핑
-      flatData.forEach(item => {
-          menuMap[item.id] = { ...item, children: [] };
-      });
-
-      // 부모-자식 관계를 연결
-      flatData.forEach(item => {
-          if (item.parent_id === null) {
-              menuTree.push(menuMap[item.id]); // 최상위 메뉴
-          } else {
-              menuMap[item.parent_id]?.children.push(menuMap[item.id]); // 서브 메뉴
-          }
-      });
-      return menuTree;
-  }
-
   // 동적으로 메뉴 렌더링
   function renderMenu(menuTree) {
-      const sidebar = document.querySelector('#sidebar');
-      sidebar.innerHTML = ''; // 기존 메뉴 초기화
+      const menuAra = document.querySelector('#sidebar > .menu-area');
+      menuAra.innerHTML = ''; // 기존 메뉴 초기화
 
       menuTree.forEach(menu => {
           const menuItem = createMenuItem(menu);
-          sidebar.appendChild(menuItem);
+          menuAra.appendChild(menuItem);
       });
   }
 
@@ -232,19 +225,14 @@ body, html {
       const parentDocument = window.parent.document;
       const sidebarIframe = parentDocument.querySelector("iframe.sidebar") ?? parentDocument.querySelector("#sidebar_container");
       const sidebarContainer = document.getElementById("sidebar_container");
-      const toggleBtn = document.getElementById("toggle-btn");
 
       // 사이드바와 아이콘 업데이트
       const isCollapsed = sidebarContainer.classList.toggle("collapsed");
       sidebarIframe.classList.toggle("collapsed");
-      updateSidebarStyle(isCollapsed, sidebarIframe, toggleBtn);
+      applySidebarTransition(sidebarIframe, (isCollapsed) ? TOGGLED_WIDTH : UNTOGGLED_WIDTH);
   }
 
-  function updateSidebarStyle(isCollapsed, sidebarIframe, toggleBtn) {
-      const newWidth = isCollapsed ? TOGGLED_WIDTH : UNTOGGLED_WIDTH;
-      applySidebarTransition(sidebarIframe, newWidth);
-  }
-
+  // 맨 처음에는 transition 제대로 적용되지 않는 문제를 해결하기 위해 사전에 animation을 실행
   function applySidebarTransition(sidebarIframe, width) {
       // 강제 리페인트를 위해 트릭 사용
       sidebarIframe.style.width = sidebarIframe.offsetWidth + "px"; // 리페인트 강제 수행
